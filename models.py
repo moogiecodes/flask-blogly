@@ -25,7 +25,7 @@ class User(db.Model):
     last_name = db.Column(db.String(20),
                             nullable=False)
     image_url = db.Column(db.Text,
-                            default="")
+                            default="https://ih1.redbubble.net/image.456962028.0512/flat,128x128,075,f-pad,128x128,f8f8f8.u1.jpg")
     posts = db.relationship('Post')
 
 
