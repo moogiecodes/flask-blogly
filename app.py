@@ -31,7 +31,10 @@ def user_list():
 
 @app.route("/users/new")
 def add_new_user():
-    return render_template('add_user_form.html')
+    """Handles 'add user' button."""
+    users = User.query.all()
+
+    return render_template('add_user_form.html', users=users)
 
 
 @app.route('/users/new', methods=['POST'])
@@ -57,7 +60,7 @@ def user_detail(user_id):
     return (render_template('user_details.html', user=user)
             if user
             else redirect('/users'))
-
+    # if user as precautionary measure disallowing nonexistent user_id
 
 @app.route('/users/<int:user_id>/edit')
 def edit_user_detail(user_id):
@@ -68,9 +71,9 @@ def edit_user_detail(user_id):
 
 @app.route('/users/<int:user_id>/edit', methods=['POST'])
 def update_user_detail(user_id):
-    action = request.form.get('submit')
-
-    if action == 'save':
+    # submit_type = request.form.get('edit')
+    
+    # if submit_type == 'edit':
         user = User.query.get(user_id)
 
         user.first_name = request.form.get('first-name')
@@ -78,5 +81,18 @@ def update_user_detail(user_id):
         user.image_url = request.form.get('image-url')
 
         db.session.commit()
+        return redirect('/users')
+    
+@app.route('/users/<int:user_id>/delete', methods=['POST'])
+def delete_user(user_id):
+    # submit_type = request.form.get('delete')
+    
+    # if submit_type == 'delete':
+        user = User.query.get(user_id)
+        
+        db.session.delete(user)
+        db.session.commit()
+        return redirect('/users')
 
-    return redirect(f'/users/{user_id}')
+# when clicking on edit in user details, gives sqlalchemy integrity error
+    # says row contains id#, null, null, null
