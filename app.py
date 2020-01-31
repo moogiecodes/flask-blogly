@@ -42,7 +42,7 @@ def add_new_user():
 def save_new_user():
     first_name = request.form.get('first-name')
     last_name = request.form.get('last-name')
-    image_url = request.form.get('image-url')
+    image_url = request.form.get('image-url') or None
 
     new_user = User(first_name=first_name,
                     last_name=last_name,
@@ -56,34 +56,36 @@ def save_new_user():
 
 @app.route('/users/<int:user_id>')
 def user_detail(user_id):
-    user = User.query.get(user_id)
+    user = User.query.get_or_404(user_id)
     
-    return (render_template('user_details.html', user=user, posts=user.posts)
-            if user
-            else redirect('/users'))
+    return render_template('user_details.html', user=user, posts=user.posts)
+
+    # return (render_template('user_details.html', user=user, posts=user.posts)
+    #         if user
+    #         else redirect('/users'))
     # if user as precautionary measure disallowing nonexistent user_id
 
 @app.route('/users/<int:user_id>/edit')
 def edit_user_detail(user_id):
-    user = User.query.get(user_id)
+    user = User.query.get_or_404(user_id)
 
     return render_template('edit_user_form.html', user=user)
 
 
 @app.route('/users/<int:user_id>/edit', methods=['POST'])
 def update_user_detail(user_id):
-    user = User.query.get(user_id)
+    user = User.query.get_or_404(user_id)
 
     user.first_name = request.form.get('first-name')
     user.last_name = request.form.get('last-name')
-    user.image_url = request.form.get('image-url')
+    user.image_url = request.form.get('image-url') or None
 
     db.session.commit()
     return redirect('/users')
     
 @app.route('/users/<int:user_id>/delete', methods=['POST'])
 def delete_user(user_id):
-    user = User.query.get(user_id)
+    user = User.query.get_or_404(user_id)
         
     db.session.delete(user)
     db.session.commit()
@@ -91,7 +93,7 @@ def delete_user(user_id):
 
 @app.route('/users/<int:user_id>/posts/new')
 def add_new_post(user_id):
-    user = User.query.get(user_id)
+    user = User.query.get_or_404(user_id)
 
     return render_template('add_post_form.html', user=user)
 
@@ -111,20 +113,20 @@ def save_new_post(user_id):
 
 @app.route('/posts/<int:post_id>')
 def user_post_detail(post_id):
-    post = Post.query.get(post_id)
+    post = Post.query.get_or_404(post_id)
     user = post.user
     return render_template('post_details.html', post=post, user=user)
 
 
 @app.route('/posts/<int:post_id>/edit')
 def edit_user_post(post_id):
-    post = Post.query.get(post_id)
+    post = Post.query.get_or_404(post_id)
  
     return render_template('edit_post_form.html', post=post)
 
 @app.route('/posts/<int:post_id>/edit', methods=['POST'])
 def update_user_post(post_id):
-    post = Post.query.get(post_id)
+    post = Post.query.get_or_404(post_id)
 
     post.title = request.form.get('post-title')
     post.content = request.form.get('post-content')
@@ -135,10 +137,12 @@ def update_user_post(post_id):
 
 @app.route('/posts/<int:post_id>/delete', methods=['POST'])
 def delete_user_post(post_id):
-    post = Post.query.get(post_id)
+    post = Post.query.get_or_404(post_id)
     user = post.user
 
     db.session.delete(post)
     db.session.commit()
 
     return redirect(f'/users/{user.id}')
+
+# GET OR 404 ?? FOR USER QUERY 
